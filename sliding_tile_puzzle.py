@@ -134,5 +134,5 @@ def getNewPuzzle(moves=200):
 
 
 # If this program was run (instead of imported), run the game:
-if __name__ == '_main_':
+if __name__ == '__main__':
     main()
