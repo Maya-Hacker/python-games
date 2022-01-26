@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 import sys
 
 print('Water Bucket Puzzle, Pour mon super papa!')
