@@ -48,12 +48,12 @@ More info at https://en.wikepedia.org/wiki/Mancala
     playerTurn = '1'  # Player 1 goes first.
 
     while True:
-        # Clear the screen so that old board isn't visible anymore:
-        # 
+        # "Clear" the screen by printing many newlines, so the old
+        # board isn't visible anymore.
         print('\n' * 60)
         # Display the board and get the players move:
         displayBoard(gameBoard)
-        playerMove = askForPlayerMove
+        playerMove = askForPlayerMove(playerTurn, gameBoard)
 
         # Carry out th eplayers move:
         playerTurn = makeMove(gameBoard, playerTurn, playerMove)
@@ -89,7 +89,7 @@ def displayBoard(board):
 
     seedAmounts = []
     # This 'GHIJKL21ABCDEF' string is the order of the pits left to
-    # right and top to bottom:\
+    # right and top to bottom:
     for pit in 'GHIJKL21ABCDEF':
         numSeedsInThisPit = str(board[pit]).rjust(2)
         seedAmounts.append(numSeedsInThisPit)
@@ -170,4 +170,46 @@ def makeMove(board, playerTurn, pit):
         board['2'] += board[oppositePit]
         board[oppositePit] = 0
 
-    # Ret
+    # Return the other player as the next player:
+    if playerTurn == '1':
+        return '2'
+    elif playerTurn == '2':
+        return '1'
+
+
+def checkForWinner(board):
+    """Looks at board and returns either '1' or '2' if there is a winner
+    or 'tie' or 'no winner' if there isn't. The game ends when a player's
+    pits are all empty; the other player claims the remaining seeds for
+    their store. The winner is whoever has the most seeds."""
+
+    player1Total = board['A'] + board['B'] + board['C']
+    player1Total += board['D'] + board['E'] + board['F']
+    player2Total = board['G'] + board['H'] + board['I']
+    player2Total += board['J'] + board['K'] + board['L']
+
+    if player1Total == 0:
+        # Player 2 gets all the remaining seeds on their side:
+        board['2'] += player2Total
+        for pit in PLAYER_2_PITS:
+            board[pit] = 0  # Set all pits to 0.
+    elif player2Total == 0:
+        # Player 1 gets all the remaining seeds on their side:
+        board['1'] += player1Total
+        for pit in PLAYER_1_PITS:
+            board[pit] = 0  # Set all pits to 0.
+    else:
+        return 'no winner'  # No one has won yet.
+
+    # Game is over, find player with largest score.
+    if board['1'] > board['2']:
+        return '1'
+    elif board['2'] > board['1']:
+        return '2'
+    else:
+        return 'tie'
+
+
+# If the program is run (instead of imported), run the game:
+if __name__ == '__main__':
+    main()
