@@ -9,11 +9,6 @@ import sys
 PLAYER_1_PITS = ('A', 'B', 'C', 'D', 'E', 'F')
 PLAYER_2_PITS = ('G', 'H', 'I', 'J', 'K', 'L')
 
-# A dictionary whose keys are pits and values are oppostie pit:
-OPPOSITE_PIT = {'A': 'G', 'B': 'H', 'C': 'I', 'D': 'J', 'E': 'K',
-                   'F': 'L', 'G': 'A', 'H': 'B', 'I': 'C', 'J': 'D',
-                   'K': 'E', 'L': 'F'}
-
 # A dictionary whose keys are pits and values are the next key in order:
 NEXT_PIT = {'A': 'B', 'B': 'C', 'C': 'D', 'D': 'E', 'E': 'F', 'F': '1',
             '1': 'L', 'L': 'K', 'K': 'J', 'J': 'I', 'I': 'H', 'H': 'G',
@@ -29,7 +24,7 @@ STARTING_NUMBER_OF_SEEDS = 4
 def main():
     print('''Mancala by Al Sweigart al@inventwithpython.com
 
-The ancient two-plauityer seed-sowing game. Grab the seeds from a pit on
+The ancient two-player seed-sowing game. Grab the seeds from a pit on
 your side and place one in each following pit, going counterclockwise
 and skipping your opponent's store. If you last seed lands in an empty
 pit of yours, move the opposite pit's seeds into that pit. The goal is
@@ -55,7 +50,7 @@ More info at https://en.wikepedia.org/wiki/Mancala
         displayBoard(gameBoard)
         playerMove = askForPlayerMove(playerTurn, gameBoard)
 
-        # Carry out th eplayers move:
+        # Carry out the players move:
         playerTurn = makeMove(gameBoard, playerTurn, playerMove)
 
         # Check if the game ended and a player has won:
@@ -160,16 +155,6 @@ def makeMove(board, playerTurn, pit):
         # The last seed landed in the player's store; take another turn.
         return playerTurn
 
-    # Check if last seed was in an empty pit; take opposite pit's seeds.
-    if playerTurn == '1' and pit in PLAYER_1_PITS and board[pit] == 1:
-        oppositePit = OPPOSITE_PIT[pit]
-        board['1'] += board[oppositePit]
-        board[oppositePit] = 0
-    elif playerTurn == '2' and pit in PLAYER_2_PITS and board[pit] == 1:
-        oppositePit = OPPOSITE_PIT[pit]
-        board['2'] += board[oppositePit]
-        board[oppositePit] = 0
-
     # Return the other player as the next player:
     if playerTurn == '1':
         return '2'
@@ -187,19 +172,6 @@ def checkForWinner(board):
     player1Total += board['D'] + board['E'] + board['F']
     player2Total = board['G'] + board['H'] + board['I']
     player2Total += board['J'] + board['K'] + board['L']
-
-    if player1Total == 0:
-        # Player 2 gets all the remaining seeds on their side:
-        board['2'] += player2Total
-        for pit in PLAYER_2_PITS:
-            board[pit] = 0  # Set all pits to 0.
-    elif player2Total == 0:
-        # Player 1 gets all the remaining seeds on their side:
-        board['1'] += player1Total
-        for pit in PLAYER_1_PITS:
-            board[pit] = 0  # Set all pits to 0.
-    else:
-        return 'no winner'  # No one has won yet.
 
     # Game is over, find player with largest score.
     if board['1'] > board['2']:
