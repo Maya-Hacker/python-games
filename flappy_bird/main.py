@@ -97,8 +97,8 @@ def main_gameplay():
 
         if p_flap:
             p_flap = False
-            p_height = game_image['joueur'].get_height()
-            p_y = p_y + min(p_vx, play_ground - p_y - p_height)
+        p_height = game_image['joueur'].get_height()
+        p_y = p_y + min(p_vx, play_ground - p_y - p_height)
 
         for pip_upper, pip_lower in zip(up_pips, low_pips):
             pip_upper['x'] += pip_Vx
@@ -149,12 +149,12 @@ def is_Colliding(p_x, p_y, up_tuyaux, low_tuyaux):
     
     for tuyau in up_tuyaux:
         pip_h = game_image['tuyau'][0].get_height()
-        if (p_y <= pip_h + tuyau['y'] and abs(p_x - tuyau['x']) <= game_image['tuyau'][0].get_width()):
+        if (p_y <= pip_h + tuyau['y'] and abs(p_x - tuyau['x']) <= game_image['tuyau'][0].get_width()//2):
             game_audio_sound['hit'].play()
             return True
         
     for tuyau in low_tuyaux:
-        if (p_y + game_image['joueur'].get_height() >= tuyau['y']) and abs(p_x - tuyau['x']) <= game_image['tuyau'][0].get_width():
+        if (p_y + game_image['joueur'].get_height() >= tuyau['y']) and abs(p_x - tuyau['x']) <= game_image['tuyau'][0].get_width()//2:
             game_audio_sound['hit'].play()
             return True
         
