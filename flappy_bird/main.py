@@ -166,6 +166,7 @@ if __name__ == "__main__":
     joueur = this_dir+'/images/bird.png'
     bcg_image = this_dir+'/images/background.png'
     tuyau_image = this_dir+'/images/pipe.png'
+    sound_extension = 'ogg'
 
     pygame.display.set_caption('Flappy bird Game')
     game_image['numbers'] = (
@@ -189,9 +190,96 @@ if __name__ == "__main__":
     )
 
     # Sons du jeu
-    game_audio_sound['die'] = pygame.mixer.Sound(this_dir+'/sounds/die.ogg')
-    game_audio_sound['hit'] = pygame.mixer.Sound(this_dir+'/sounds/hit.ogg')
-    game_audio_sound['point'] = pygame.mixer.Sound(this_dir+'/sounds/point.ogg')
-    game_audio_sound['swoosh'] = pygame.mixer.Sound(this_dir+'/sounds/swoosh.ogg')
-    game_audio_sound['wing'] = pygame.mixer.Sound(this_dir+'/sounds/wing.ogg')
+    game_audio_sound['die'] = pygame.mixer.Sound(this_dir+'/sounds/die.'+sound_extension)
+    game_audio_sound['hit'] = pygame.mixer.Sound(this_dir+'/sounds/hit.'+sound_extension)
+    game_audio_sound['point'] = pygame.mixer.Sound(this_dir+'/sounds/point.'+sound_extension)
+    game_audio_sound['swoosh'] = pygame.mixer.Sound(this_dir+'/sounds/swoosh.'+sound_extension)
+    game_audio_sound['wing'] = pygame.mixer.Sound(this_dir+'/sounds/wing.'+sound_extension)
 
+
+import random
+import sys
+import pygame
+from pygame.locals import *
+
+FPS = 32
+scr_width = 289
+scr_height = 511
+display_screen_window = pygame.display.set_mode((scr_width, scr_height))
+play_ground = scr_height * 0.8
+game_image = {}
+game_audio_sound = {}
+joueur = 'images/oiseau.png'
+bcg_image = 'images/fond.png'
+tuyau_image = 'images/tuyau.png'
+
+
+def welcome_main_screen():
+    p_x = int(scr_width / 5)
+    p_y = int((scr_height - game_image['joueur'].get_height()) / 2)
+    msgx = int((scr_width - game_image['message'].get_width()) / 2)
+    msgy = int(scr_height * 0.13)
+    b_x = 0
+    while True:
+        for event in pygame.event.get():
+
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+
+
+            elif event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+                return
+            else:
+                display_screen_window.blit(game_image['fond'], (0, 0))
+                display_screen_window.blit(game_image['joueur'], (p_x, p_y))
+                display_screen_window.blit(game_image['message'], (msgx, msgy))
+                display_screen_window.blit(game_image['base'], (b_x, play_ground))
+                pygame.display.update()
+                time_clock.tick(FPS)
+
+
+def main_gameplay():
+    score = 0
+    p_x = int(scr_width / 5)
+    p_y = int(scr_width / 2)
+    b_x = 0
+
+
+    n_pip1 = get_Random_Tuyaux()
+    n_pip2 = get_Random_Tuyaux()
+    up_pips = [
+        {'x': scr_width + 200, 'y': n_pip1[0]['y']},
+        {'x': scr_width + 200 + (scr_width / 2), 'y': n_pip2[0]['y']},
+    ]
+
+    low_pips = [
+        {'x': scr_width + 200, 'y': n_pip1[1]['y']},
+        {'x': scr_width + 200 + (scr_width / 2), 'y': n_pip2[1]['y']},
+    ]
+
+    pip_Vx = -4
+
+    p_vx = -9
+    p_mvx = 10
+    p_mvy = -8
+    p_accuracy = 1
+
+    p_flap_accuracy = -8
+    p_flap = False
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN and (event.key == K_SPACE or event.key == K_UP):
+                if p_y >; 0:
+                    p_vx = p_flap_accuracy
+                    p_flap = True
+                    game_audio_sound['wing'].play()
+
+                    cr_tst = is_Colliding(p_x, p_y, up_pips, low_pips)
+                    if cr_tst:
+                        return
+                    
