@@ -104,7 +104,7 @@ def main_gameplay():
             pip_upper['x'] += pip_Vx
             pip_lower['x'] += pip_Vx
 
-        if 0 <= up_pips[0]['x'] <= 5:
+        if 0 <= up_pips[0]['x'] <= 4:
             new_pip = get_Random_Tuyaux()
             up_pips.append(new_pip[0])
             low_pips.append(new_pip[1])
@@ -210,8 +210,10 @@ if __name__ == "__main__":
     game_audio_sound['die'] = pygame.mixer.Sound(this_dir+'/sounds/die.'+sound_extension)
     game_audio_sound['hit'] = pygame.mixer.Sound(this_dir+'/sounds/hit.'+sound_extension)
     game_audio_sound['point'] = pygame.mixer.Sound(this_dir+'/sounds/point.'+sound_extension)
+    game_audio_sound['point'].set_volume(0.2)
     game_audio_sound['swoosh'] = pygame.mixer.Sound(this_dir+'/sounds/swoosh.'+sound_extension)
     game_audio_sound['wing'] = pygame.mixer.Sound(this_dir+'/sounds/wing.'+sound_extension)
+    game_audio_sound['wing'].set_volume(0.2)
 
     game_image['fond'] = pygame.image.load(bcg_image).convert()
     game_image['joueur'] = pygame.image.load(joueur).convert_alpha()
