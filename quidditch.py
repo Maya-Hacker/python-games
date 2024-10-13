@@ -6,8 +6,7 @@ import math
 
 my_team_id = int(input())  # if 0 you need to score on the right of the map, if 1 you need to score on the left
 
-
-class Snaffle:
+class Entity:
     def __init__(self, inputs: list[str]):
         self.id = int(inputs[0])  # entity identifier
         self.entity_type = inputs[1]  # "WIZARD", "OPPONENT_WIZARD" or "SNAFFLE" (or "BLUDGER" after first league)
@@ -15,18 +14,16 @@ class Snaffle:
         self.y = int(inputs[3])  # position
         self.vx = int(inputs[4])  # velocity
         self.vy = int(inputs[5])  # velocity
+
+class Snaffle(Entity):
+    def __init__(self, inputs: list[str]):
+        super().__init__(inputs)
         self.is_held = int(inputs[6])  # 1 if the wizard is holding a Snaffle, 0 otherwise
 
-class Wizard:
+class Wizard(Entity):
     def __init__(self, inputs: list[str]):
-        self.id = int(inputs[0])  # entity identifier
-        self.entity_type = inputs[1]  # "WIZARD", "OPPONENT_WIZARD" or "SNAFFLE" (or "BLUDGER" after first league)
-        self.x = int(inputs[2])  # position
-        self.y = int(inputs[3])  # position
-        self.vx = int(inputs[4])  # velocity
-        self.vy = int(inputs[5])  # velocity
+        super().__init__(inputs)
         self.has_snaffle = int(inputs[6])  # 1 if the wizard is holding a Snaffle, 0 otherwise
-
         self.do_the_thing = ""
         self.thrust = 150
 
