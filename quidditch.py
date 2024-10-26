@@ -12,26 +12,21 @@ class Position:
         self.y = y
 
     def __repr__(self):
-        return f"({self.x}, {self.y})"
+        return f"{self.x} {self.y}"
 
     def dist(self, other):
         return math.sqrt((self.x-other.x)**2 + (self.y-other.y)**2)
 
-# example
-goal_pos_R = Position(16000, 3750)
-goal_pos_L = Position(0, 3750)
-goal_pos_R.x
-print(f"{goal_pos_R=}, {goal_pos_R.dist(goal_pos_L)}", file=sys.stderr, flush=True)
-# fff
+class Velocity(Position):
+    pass
+
 
 class Entity:
     def __init__(self, inputs: list[str]):
         self.id = int(inputs[0])  # entity identifier
         self.entity_type = inputs[1]  # "WIZARD", "OPPONENT_WIZARD" or "SNAFFLE" (or "BLUDGER" after first league)
-        self.x = int(inputs[2])  # position
-        self.y = int(inputs[3])  # position
-        self.vx = int(inputs[4])  # velocity
-        self.vy = int(inputs[5])  # velocity
+        self.pos = Position(int(inputs[2]), int(inputs[3]))
+        self.vel = Velocity(int(inputs[4]), int(inputs[5]))
 
 class Snaffle(Entity):
     def __init__(self, inputs: list[str]):
@@ -45,33 +40,39 @@ class Wizard(Entity):
         self.do_the_thing = ""
         self.thrust = 150
 
-    def throw(self, x_y = None):
-        if my_team_id == 0:
-            goal_x = 16000
-        else:
-            goal_x = 0
-        goal_y = 3750
-        if x_y is not None:
-            goal_x, goal_y = x_y
-        self.do_the_thing = f"THROW {goal_x} {goal_y} 500"
+    def throw(self, pos: Position | None = None):
+        if not pos:
+            if my_team_id == 0:
+                pos = goal_pos_R
+            else:
+                pos = goal_pos_L
+
+        self.do_the_thing = f"THROW {pos} 500"
 
     def move_to_snaffle(self, snaffleindex: int):
         # print(f"move_to_snaffle {snaffleindex=}", file=sys.stderr, flush=True)
         the_snaffle = the_list_of_snaffles[snaffleindex]
-        self.do_the_thing = f"MOVE {the_snaffle.x} {the_snaffle.y} {self.thrust}"
+        self.do_the_thing = f"MOVE {the_snaffle.pos} {self.thrust}"
 
     def protect_rings(self):
+        prot_pos = Position(PROTECTION_RING_DIST, 3750)
         if my_team_id == 0:
-            goal_x = 3000
+            pass
         else:
-            goal_x = 13000
-        goal_y = 3750
-        self.do_the_thing = f"MOVE {goal_x} {goal_y} {self.thrust}"
+            prot_pos.x = 16000 - PROTECTION_RING_DIST
+        self.do_the_thing = f"MOVE {prot_pos} {self.thrust}"
 
 
     
 the_list_of_snaffles: list[Snaffle] = []
+goal_pos_R = Position(16000, 3750)
+goal_pos_L = Position(0, 3750)
+# example
+goal_pos_R.x
+print(f"{goal_pos_R=}, {goal_pos_R.dist(goal_pos_L)}", file=sys.stderr, flush=True)
+# fff
 
+PROTECTION_RING_DIST = 3000
 
 # game loop
 while True:
@@ -106,12 +107,6 @@ while True:
 
         if entity_type == 'SNAFFLE':
             the_list_of_snaffles.append(Snaffle(inputs))
-
-        x = int(inputs[2])  # position
-        y = int(inputs[3])  # position
-        vx = int(inputs[4])  # velocity
-        vy = int(inputs[5])  # velocity
-        state = int(inputs[6])  # 1 if the wizard is holding a Snaffle, 0 otherwise
 
     if harry.has_snaffle:
         harry.throw()
