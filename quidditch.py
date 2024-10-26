@@ -27,16 +27,29 @@ class Wizard(Entity):
         self.do_the_thing = ""
         self.thrust = 150
 
-    def throw(self):
+    def throw(self, x_y = None):
         if my_team_id == 0:
             goal_x = 16000
         else:
             goal_x = 0
-        self.do_the_thing = f"THROW {goal_x} 3750 500"
+        goal_y = 3750
+        if x_y is not None:
+            goal_x, goal_y = x_y
+        self.do_the_thing = f"THROW {goal_x} {goal_y} 500"
 
     def move_to_snaffle(self, snaffleindex: int):
+        # print(f"move_to_snaffle {snaffleindex=}", file=sys.stderr, flush=True)
         the_snaffle = the_list_of_snaffles[snaffleindex]
         self.do_the_thing = f"MOVE {the_snaffle.x} {the_snaffle.y} {self.thrust}"
+
+    def protect_rings(self):
+        if my_team_id == 0:
+            goal_x = 1000
+        else:
+            goal_x = 15000
+        goal_y = 3750
+        self.do_the_thing = f"MOVE {goal_x} {goal_y} {self.thrust}"
+
 
     
 the_list_of_snaffles: list[Snaffle] = []
@@ -58,7 +71,7 @@ while True:
     harry: Wizard = None
     ron: Wizard = None
     draco: Wizard = None
-    crab: Wizard = None
+    crabbe: Wizard = None
 
     the_list_of_snaffles = []
 
@@ -78,7 +91,7 @@ while True:
             if not draco:
                 draco = Wizard(inputs)
             else:
-                crab = Wizard(inputs)
+                crabbe = Wizard(inputs)
 
         if entity_type == 'SNAFFLE':
             the_list_of_snaffles.append(Snaffle(inputs))
@@ -109,9 +122,9 @@ while True:
         harry.move_to_snaffle(0)
 
     if ron.has_snaffle:
-        ron.throw()
+        ron.throw([harry.x, harry.y])
     else:
-        ron.move_to_snaffle(1)
+        ron.protect_rings()
 
 
     print(harry.do_the_thing)
