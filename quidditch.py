@@ -33,6 +33,9 @@ class Snaffle(Entity):
         super().__init__(inputs)
         self.is_held = int(inputs[6])  # 1 if the wizard is holding a Snaffle, 0 otherwise
 
+    def __repr__(self):
+        return f"Snaffle({self.pos})"
+
 class Wizard(Entity):
     def __init__(self, inputs: list[str]):
         super().__init__(inputs)
@@ -49,9 +52,14 @@ class Wizard(Entity):
 
         self.do_the_thing = f"THROW {pos} 500"
 
-    def move_to_snaffle(self, snaffleindex: int):
-        # print(f"move_to_snaffle {snaffleindex=}", file=sys.stderr, flush=True)
-        the_snaffle = the_list_of_snaffles[snaffleindex]
+    def move_to_snaffle(self):
+        def dist_to_self(snaffle):
+            return self.pos.dist(snaffle.pos)
+        # print(f"{the_list_of_snaffles=}", file=sys.stderr, flush=True)
+        closest_snaffles = sorted(the_list_of_snaffles, key=dist_to_self)
+        # print(f"{closest_snaffles=}", file=sys.stderr, flush=True)
+        the_snaffle = closest_snaffles[0]
+
         self.do_the_thing = f"MOVE {the_snaffle.pos} {self.thrust}"
 
     def protect_rings(self):
@@ -116,14 +124,14 @@ while True:
     if harry.has_snaffle:
         harry.throw()
     else:
-        harry.move_to_snaffle(0)
+        harry.move_to_snaffle()
 
     if ron.has_snaffle:
         if ron.obstruction():
             ron.throw([harry.x, harry.y])
         ron.throw()
     elif len(the_list_of_snaffles) > 1:
-        ron.move_to_snaffle(1)
+        ron.move_to_snaffle()
     else:
         ron.protect_rings()
 
