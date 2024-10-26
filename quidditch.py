@@ -61,9 +61,11 @@ class Wizard(Entity):
         else:
             prot_pos.x = 16000 - PROTECTION_RING_DIST
         dist_to_protect = self.pos.dist(prot_pos)
-        thrust = min(self.thrust, dist_to_protect * SLOW_DOWN_FACTOR)
+        thrust = int(min(self.thrust, dist_to_protect * SLOW_DOWN_FACTOR))
         self.do_the_thing = f"MOVE {prot_pos} {thrust}"
 
+    def obstruction(self):
+        return False
 
     
 the_list_of_snaffles: list[Snaffle] = []
@@ -117,7 +119,8 @@ while True:
         harry.move_to_snaffle(0)
 
     if ron.has_snaffle:
-        # ron.throw([harry.x, harry.y])
+        if ron.obstruction():
+            ron.throw([harry.x, harry.y])
         ron.throw()
     elif len(the_list_of_snaffles) > 1:
         ron.move_to_snaffle(1)
