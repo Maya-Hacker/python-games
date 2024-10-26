@@ -6,6 +6,24 @@ import math
 
 my_team_id = int(input())  # if 0 you need to score on the right of the map, if 1 you need to score on the left
 
+class Position:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"({self.x}, {self.y})"
+
+    def dist(self, other):
+        return math.sqrt((self.x-other.x)**2 + (self.y-other.y)**2)
+
+# example
+goal_pos_R = Position(16000, 3750)
+goal_pos_L = Position(0, 3750)
+goal_pos_R.x
+print(f"{goal_pos_R=}, {goal_pos_R.dist(goal_pos_L)}", file=sys.stderr, flush=True)
+# fff
+
 class Entity:
     def __init__(self, inputs: list[str]):
         self.id = int(inputs[0])  # entity identifier
@@ -44,9 +62,9 @@ class Wizard(Entity):
 
     def protect_rings(self):
         if my_team_id == 0:
-            goal_x = 1000
+            goal_x = 3000
         else:
-            goal_x = 15000
+            goal_x = 13000
         goal_y = 3750
         self.do_the_thing = f"MOVE {goal_x} {goal_y} {self.thrust}"
 
@@ -60,13 +78,6 @@ while True:
     my_score, my_magic = [int(i) for i in input().split()]
     opponent_score, opponent_magic = [int(i) for i in input().split()]
     entities = int(input())  # number of entities still in game
-
-    s4_x = 0
-    s4_y = 0
-    w0_s = 0
-    s5_x = 0
-    s5_y = 0
-    w1_s = 0
 
     harry: Wizard = None
     ron: Wizard = None
@@ -102,29 +113,19 @@ while True:
         vy = int(inputs[5])  # velocity
         state = int(inputs[6])  # 1 if the wizard is holding a Snaffle, 0 otherwise
 
-        if entity_id == 0:
-            w0_s = state 
-        if entity_id == 1:
-            w1_s = state
-        if entity_id == 4:
-            s4_x = x
-            s4_y = y
-        if entity_id == 5:
-            s5_x = x
-            s5_y = y 
-
-    print(f"{w0_s=}", file=sys.stderr, flush=True)
-    print(f"{w1_s=}", file=sys.stderr, flush=True)
-
     if harry.has_snaffle:
         harry.throw()
     else:
         harry.move_to_snaffle(0)
 
     if ron.has_snaffle:
-        ron.throw([harry.x, harry.y])
+        # ron.throw([harry.x, harry.y])
+        ron.throw()
+    elif len(the_list_of_snaffles) > 1:
+        ron.move_to_snaffle(1)
     else:
         ron.protect_rings()
+
 
 
     print(harry.do_the_thing)
