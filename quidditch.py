@@ -60,7 +60,9 @@ class Wizard(Entity):
             pass
         else:
             prot_pos.x = 16000 - PROTECTION_RING_DIST
-        self.do_the_thing = f"MOVE {prot_pos} {self.thrust}"
+        dist_to_protect = self.pos.dist(prot_pos)
+        thrust = min(self.thrust, dist_to_protect * SLOW_DOWN_FACTOR)
+        self.do_the_thing = f"MOVE {prot_pos} {thrust}"
 
 
     
@@ -72,6 +74,7 @@ goal_pos_R.x
 print(f"{goal_pos_R=}, {goal_pos_R.dist(goal_pos_L)}", file=sys.stderr, flush=True)
 # fff
 
+SLOW_DOWN_FACTOR = 4
 PROTECTION_RING_DIST = 3000
 
 # game loop
