@@ -28,6 +28,14 @@ class Entity:
         self.pos = Position(int(inputs[2]), int(inputs[3]))
         self.vel = Velocity(int(inputs[4]), int(inputs[5]))
 
+    def distance_to_goal(self):
+        return self.pos.x - goal_attack.x
+
+    def velocity_to_goal(self) -> float:
+        if my_team_id == 1:
+            return -self.vel.x
+        return self.vel.x
+
 class Snaffle(Entity):
     def __init__(self, inputs: list[str]):
         super().__init__(inputs)
@@ -45,21 +53,20 @@ class Wizard(Entity):
 
     def throw(self, pos: Position | None = None):
         if not pos:
-            if my_team_id == 0:
-                pos = goal_pos_R
-            else:
-                pos = goal_pos_L
-
+            pos = goal_attack
         self.do_the_thing = f"THROW {pos} 500"
 
-    def move_to_snaffle(self):
+    def closest_snaffle(self):
         def dist_to_self(snaffle):
             return self.pos.dist(snaffle.pos)
         # print(f"{the_list_of_snaffles=}", file=sys.stderr, flush=True)
         closest_snaffles = sorted(the_list_of_snaffles, key=dist_to_self)
         # print(f"{closest_snaffles=}", file=sys.stderr, flush=True)
         the_snaffle = closest_snaffles[0]
+        return the_snaffle
 
+    def move_to_snaffle(self):
+        the_snaffle = self.closest_snaffle()
         self.do_the_thing = f"MOVE {the_snaffle.pos} {self.thrust}"
 
     def protect_rings(self):
@@ -68,24 +75,56 @@ class Wizard(Entity):
             pass
         else:
             prot_pos.x = 16000 - PROTECTION_RING_DIST
+
+        snaf = self.closest_snaffle()
+        prot_pos.y = snaf.pos.y + snaf.vel.y * 5
+        prot_pos.y = min(UPPER_POST_Y - WIS_RAD, max(LOWER_POST_Y + WIS_RAD, prot_pos.y))
+
+
         dist_to_protect = self.pos.dist(prot_pos)
         thrust = int(min(self.thrust, dist_to_protect * SLOW_DOWN_FACTOR))
         self.do_the_thing = f"MOVE {prot_pos} {thrust}"
 
+    def obliviate(self, bludger):
+        self.do_the_thing = f"OBLIVIATE {bludger.id}"
+
+    def petrificus(self, entity):
+        self.do_the_thing = f"PETRIFICUS {entity.id}"
+
+    def accio(self, snaffle):
+        self.do_the_thing = f"ACCIO {snaffle.id}"
+
+    def flipendo(self, entity):
+        self.do_the_thing = f"FLIPENDO {entity.id}"
+
     def obstruction(self):
         return False
 
-    
+
+
+WIS_RAD = 400
 the_list_of_snaffles: list[Snaffle] = []
 goal_pos_R = Position(16000, 3750)
 goal_pos_L = Position(0, 3750)
-# example
-goal_pos_R.x
-print(f"{goal_pos_R=}, {goal_pos_R.dist(goal_pos_L)}", file=sys.stderr, flush=True)
-# fff
+UPPER_POST_Y = 3750+2000
+LOWER_POST_Y = 3750-2000
+goal_attack = goal_pos_R
+goal_defend = goal_pos_L
+if my_team_id == 1:
+    goal_attack = goal_pos_L
+    goal_defend = goal_pos_R
+
 
 SLOW_DOWN_FACTOR = 4
-PROTECTION_RING_DIST = 3000
+PROTECTION_RING_DIST = 1500
+
+FLIPENDO_COST = 20
+
+def snaffle_close_to_goal():
+    for snaffle in the_list_of_snaffles:
+        if snaffle.distance_to_goal() < 1500:
+            return snaffle
+
 
 # game loop
 while True:
@@ -133,8 +172,17 @@ while True:
     elif len(the_list_of_snaffles) > 1:
         ron.move_to_snaffle()
     else:
+        print(f"Ron protecting Rings", file=sys.stderr, flush=True)
         ron.protect_rings()
 
+    if snaffle := snaffle_close_to_goal():
+        if snaffle.velocity_to_goal() < 10:
+            if my_magic >= FLIPENDO_COST:
+                my_magic -= FLIPENDO_COST
+                ron.flipendo(snaffle)
+
+    if my_magic > 30:
+        harry.petrificus(draco)
 
 
     print(harry.do_the_thing)
